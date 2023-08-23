@@ -1,0 +1,5 @@
+*.tsbuildinfo
+*DS_Store
+*.log
+node_modules/
+.yarn

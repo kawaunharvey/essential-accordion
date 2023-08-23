@@ -1,0 +1,8 @@
+{
+  "*.{js,jsx,css,scss,md,json}": ["prettier --write"],
+  "*.{ts,tsx}": [
+    "prettier --parser typescript --write --no-semi",
+    "eslint --cache --fix",
+    "bash -c tsc --project tsconfig.json --noEmit"
+  ]
+}
