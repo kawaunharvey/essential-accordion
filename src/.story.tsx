@@ -1,17 +1,73 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { Component } from './module'
+import React from 'react'
+import styled from 'styled-components'
 
-// More on how to set up stories at: https://storybook.js.org/docs/react/writing-stories/introduction#default-export
-const meta: Meta<typeof Component> = {
+const faq = [
+  {
+    id: 'one',
+    question: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit?',
+    answer:
+      'Proin maximus tellus purus, nec hendrerit risus luctus eu. Vivamus sed erat metus. Suspendisse a lorem nulla. Etiam porttitor dui eget placerat consectetur. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Proin aliquam turpis sit amet nibh aliquam, id aliquet dolor aliquam. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Morbi malesuada, nunc non dapibus fringilla, ex quam aliquam velit, sit amet commodo risus magna sit amet tortor. Nullam mollis augue non leo rutrum scelerisque.',
+  },
+  {
+    id: 'two',
+    question: 'title',
+    answer: 'answer',
+  },
+  {
+    id: 'three',
+    question: 'title',
+    answer: 'answer',
+  },
+]
+
+const ItemHead = styled.div`
+  font-family: 'Inter', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  cursor: pointer;
+
+  [aria-expanded='true'] &,
+  &:hover {
+    color: #1e90ff;
+  }
+`
+
+const ItemBody = styled.div`
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  font-weight: 400;
+  margin-bottom: 1rem;
+`
+
+const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+`
+
+const StoryComponent = (args) => (
+  <Component leaveOpen={true}>
+    {faq.map((item) => (
+      <Container key={item.id}>
+        <ItemHead>{item.question}</ItemHead>
+        <ItemBody>
+          <p>{item.answer}</p>
+        </ItemBody>
+      </Container>
+    ))}
+  </Component>
+)
+
+const meta: Meta<typeof StoryComponent> = {
   title: 'Component',
-  component: Component,
+  component: StoryComponent,
   parameters: {
-    // Optional parameter to center the component in the Canvas. More info: https://storybook.js.org/docs/react/configure/story-layout
     layout: 'fullscreen',
   },
-  // This component will have an automatically generated Autodocs entry: https://storybook.js.org/docs/react/writing-docs/autodocs
   tags: ['autodocs'],
-  // More on argTypes: https://storybook.js.org/docs/react/api/argtypes
   argTypes: {
     backgroundColor: { control: 'color' },
   },
@@ -19,10 +75,8 @@ const meta: Meta<typeof Component> = {
 
 export default meta
 
-type Story = StoryObj<typeof Component>
-
-// More on writing stories with args: https://storybook.js.org/docs/react/writing-stories/args
-export const Primary: Story = {
+type Story = StoryObj<typeof StoryComponent>
+export const Default: Story = {
   args: {
     primary: true,
   },
