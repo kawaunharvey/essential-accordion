@@ -1,69 +1,56 @@
-import { useRef, useState, useEffect, useCallback, Children } from 'react'
+import { useRef, useState, useEffect, Children, useCallback } from 'react'
 import { IItem } from './types'
+import { useHeight } from './utils'
 
-export const Item = ({ isOpen, handleOpen, children, ...props }: IItem) => {
+export const Item = ({ isOpen, children, ...props }: IItem) => {
   const itemParts = Children.toArray(children)
   const group = useRef<HTMLDivElement>(null)
-  const groupHeader = useRef<HTMLButtonElement>(null)
-  const [height, setHeight] = useState<number>()
-  const [state, setState] = useState<{
-    originalHeight: number
-    headerHeight: number
-  }>()
-
+  const groupHeader = useRef<HTMLDivElement>(null)
+  const [loaded, setLoaded] = useState(false)
+  const [open, setOpen] = useState<boolean>(isOpen)
+  const maxHeight = useHeight(group, loaded)
+  const minHeight = useHeight(groupHeader, loaded)
+  const id = props.id || 'section-' + Math.random().toString(36).substr(2, 9)
   useEffect(() => {
-    if (group.current && groupHeader.current) {
-      const g = group.current.clientHeight
-      const h = groupHeader.current.clientHeight
-      setState({
-        originalHeight: g,
-        headerHeight: h,
-      })
+    if (loaded) return
+    setTimeout(() => setLoaded(true), 50)
+  }, [loaded])
+
+  const handleOpen = useCallback(() => {
+    setOpen(!open)
+  }, [open])
+
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      setOpen(!open)
     }
-  }, [])
-
-  useEffect(
-    () =>
-      state && setHeight(isOpen ? state?.originalHeight : state?.headerHeight),
-    [state, isOpen]
-  )
-
-  const handleClick = useCallback(() => {
-    handleOpen()
-    setHeight(isOpen ? state?.originalHeight : state?.headerHeight)
-  }, [handleOpen, isOpen])
+  }
 
   const [head, body] = itemParts
   return (
     <div
-      id="group"
-      ref={group}
       style={{
-        height: state?.originalHeight,
-        maxHeight: height,
-        transition: 'max-height 0.2s linear',
+        maxHeight: open ? maxHeight : minHeight,
+        transition: 'max-height 0.1s ease',
         overflow: 'hidden',
-        cursor: 'pointer',
       }}
       {...props}
     >
-      <button
-        onClick={handleClick}
-        style={{
-          margin: 0,
-          padding: 0,
-          border: 'none',
-          background: 'none',
-          boxSizing: 'border-box',
-          width: '100%',
-          textAlign: 'left',
-        }}
-        ref={groupHeader}
-        aria-expanded={isOpen}
-      >
-        {head}
-      </button>
-      {body}
+      <div ref={group}>
+        <div ref={groupHeader} role="heading" aria-level={1}>
+          <div
+            role="button"
+            tabIndex={0}
+            aria-expanded={isOpen}
+            aria-controls={id}
+            onClick={handleOpen}
+            onKeyDown={handleKeyPress}
+          >
+            {head}
+          </div>
+        </div>
+        <div id={id}>{body}</div>
+      </div>
     </div>
   )
 }
